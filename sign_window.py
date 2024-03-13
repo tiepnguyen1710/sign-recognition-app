@@ -20,7 +20,6 @@ class SignWindow:
         screen_width = self.master.winfo_screenwidth()
         screen_height = self.master.winfo_screenheight()
 
-        # Tính toán vị trí để đặt cửa sổ vào giữa màn hình
         x = (screen_width - 1200) // 2
         y = (screen_height - 800) // 2
 
