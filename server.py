@@ -11,6 +11,8 @@ def receive_data():
         
         if data:
             
+            # get data from AI and display
+            
             print(data["data"])
             
             return jsonify({'message': 'Data received successfully'}), 200
