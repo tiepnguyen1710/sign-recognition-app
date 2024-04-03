@@ -3,6 +3,8 @@ from tkinter import Frame, Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel
 import cv2
 from PIL import Image, ImageTk
 from pathlib import Path
+import requests
+  
 
 OUTPUT_PATH = Path(__file__).parent
 ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
@@ -25,8 +27,8 @@ class SignWindow:
 
         self.master.geometry(f"1200x700+{x}+{y}")
 
-        self.main_frame = Frame(self.master, width=700, height=480, bg="white")
-        self.main_frame.place(relx=0.5, rely=0.43, anchor=tk.CENTER)
+        self.main_frame = Frame(self.master, width=700, height=500, bg="white")
+        self.main_frame.place(relx=0.5, rely=0.42, anchor=tk.CENTER)
         self.main_frame.pack_propagate(False)  
 
         self.label = Label(self.main_frame)
@@ -35,8 +37,8 @@ class SignWindow:
         self.cap = cv2.VideoCapture(0)
         
 
-        self.text_label = Label(self.master, text="", font=("Arial", 12))
-        self.text_label.place(relx=0.5, rely=0.86, anchor=tk.CENTER)
+        self.text_label = Label(self.master, text="hello", font=("Arial", 17))
+        self.text_label.place(relx=0.5, rely=0.83, anchor=tk.CENTER)
 
         self.button = Button(
             self.master, 
@@ -68,9 +70,10 @@ class SignWindow:
         )           
         
         self.show_frame()
+        self.data_from_server()
     
-    def detect_sign(self):
-        self.text_label.config(text="Hello World!")
+    #def detect_sign(self):
+        #self.text_label.config(text="Hello World!")
 
     def show_frame(self):
         ret, frame = self.cap.read()
@@ -84,10 +87,26 @@ class SignWindow:
             self.label.img = img
             self.label.config(image=img)
             self.label.after(10, self.show_frame)
-
-
+    
+    def data_from_server(self):
+        response = requests.post('http://localhost:5000/api/data')
+        if response.status_code == 200:
+            data = response.json()
+            self.display_received_data(data)
+        else:
+            print("Error fetching data")
+            self.master.after(1000, self.data_from_server)
+    
+    def display_received_data(self, data):
+        received_data = data.get('data')
+        if received_data:
+            self.text_label.config(text=received_data)
+        else:
+            print("No data received")
+        self.master.after(1000, self.data_from_server)
 
 if __name__ == "__main__":
     root = tk.Tk()
     sign_window = SignWindow(root)
+    sign_window.detect_sign()
     root.mainloop()
