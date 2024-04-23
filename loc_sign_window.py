@@ -392,6 +392,10 @@ class CameraApp:
         url = f'http://{cam_ip}/cam.mjpeg'
         auth = (username, password)
         try:
+            cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
+            cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  # Thay đổi kích thước cửa sổ hiển thị
+
+            cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8))  # Hiển thị cửa sổ trước khi kết nối
             response = requests.get(url, auth=auth, stream=True)
             response.raise_for_status()  # Kiểm tra nếu có lỗi trong quá trình nhận dữ liệu
 
@@ -404,12 +408,12 @@ class CameraApp:
                     jpg = bytes[a:b + 2]
                     bytes = bytes[b + 2:]
                     frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame_pil = Image.fromarray(frame_rgb)
-                    frame_tk = ImageTk.PhotoImage(frame_pil)
-                    self.video_panel.config(image=frame_tk)
-                    self.video_panel.image = frame_tk
-                    # cv2.imshow('ESP32-CAM Stream', frame)
+                    # frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    # frame_pil = Image.fromarray(frame_rgb)
+                    # frame_tk = ImageTk.PhotoImage(frame_pil)
+                    # self.video_panel.config(image=frame_tk)
+                    # self.video_panel.image = frame_tk
+                    cv2.imshow('ESP32-CAM Stream', frame)
                 if cv2.waitKey(1) == ord('x'):
                     self.esp_running = False
                     self.stop_camera()
