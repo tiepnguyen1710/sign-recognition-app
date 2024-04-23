@@ -1,566 +1,195 @@
-# import tkinter as tk
-# from tkinter import Frame, Tk, Canvas, Entry, Text, Button, PhotoImage, Toplevel, Label
 # import cv2
-# from PIL import Image, ImageTk
-# from pathlib import Path
-# import requests
-# OUTPUT_PATH = Path(__file__).parent
-# ASSETS_PATH = OUTPUT_PATH / Path(r"assets\frame0")
-
-
-# class SignWindow:
-
-#     @staticmethod
-#     def relative_to_assets(path: str) -> Path:
-#         return ASSETS_PATH / Path(path)
-    
-#     def __init__(self, master):
-#         self.master = master
-#         self.master.title("Sign Recognition")
-#         screen_width = self.master.winfo_screenwidth()
-#         screen_height = self.master.winfo_screenheight()
-
-#         x = (screen_width - 1200) // 2
-#         y = (screen_height - 800) // 2
-
-#         self.master.geometry(f"1200x700+{x}+{y}")
-
-#         self.main_frame = Frame(self.master, width=700, height=480, bg="white")
-#         self.main_frame.place(relx=0.5, rely=0.43, anchor=tk.CENTER)
-#         self.main_frame.pack_propagate(False)  
-
-#         self.label = Label(self.main_frame)
-#         self.label.pack()
-
-#         self.cap = cv2.VideoCapture(0)
-        
-
-#         self.text_label = Label(self.master, text="", font=("Arial", 12))
-#         self.text_label.place(relx=0.5, rely=0.86, anchor=tk.CENTER)
-
-#         self.button = Button(
-#             self.master, 
-#             text="Click", 
-#             bg="#4CAF50",  
-#             fg="white",    
-#             font=("Arial", 12),  
-#             relief="raised",     
-#             borderwidth=2,       
-#             padx=10,             
-#             pady=5                
-#         )
-#         self.button.place(relx=0.5, rely=0.93, anchor=tk.CENTER)
-
-#         self.canvas = Canvas(self.master, width=1200, height=150)
-#         self.canvas.place(x = 0, y = 0)
-        
-#         self.image_image_2 = PhotoImage(file=self.relative_to_assets("image_2.png"))
-
-#         self.canvas.create_image(55.0, 72.0, image=self.image_image_2)
-
-#         self.canvas.create_text(
-#             90.0,
-#             56.0,
-#             anchor="nw",
-#             text="SIGN RECOGNITION",
-#             fill="#000000",
-#             font=("Lato Bold", 27 * -1)
-#         )           
-        
-#         self.show_frame()
-    
-#     def detect_sign(self):
-#         # self.text_label.config(text="Hello World!")
-#         ret, frame = self.cap.read()
-#         if ret:
-#             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#             _, img_encoded = cv2.imencode('.jpg', frame)
-#             response = requests.post("http://<AI_IP_ADDRESS>/api/process_image", data=img_encoded.tostring())
-#             if response.status_code == 200:
-#                 print("Image sent successfully!")
-#             else:
-#                 print("Failed to send image:", response.status_code)
-#     def show_frame(self):
-#         # ret, frame = self.cap.read()
-#         # if ret:
-#         #     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-#         #     frame = cv2.resize(frame, (self.main_frame.winfo_width(), self.main_frame.winfo_height()))
-
-#         #     img = Image.fromarray(frame)
-#         #     img = ImageTk.PhotoImage(image=img)
-#         #     self.label.img = img
-#         #     self.label.config(image=img)
-#         #     self.label.after(10, self.show_frame)
-#         url = 'http://192.168.1.21/cam-hi.jpg'
-#         imgResp = requests.get(url)
-#         imgNp = np.array(bytearray(imgResp.content), dtype=np.uint8)
-#         img = cv2.imdecode(imgNp, -1)
-#         frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-#         frame = cv2.resize(frame, (self.main_frame.winfo_width(), self.main_frame.winfo_height()))
-
-#         img = Image.fromarray(frame)
-#         img = ImageTk.PhotoImage(image=img)
-#         self.label.img = img
-#         self.label.config(image=img)
-#         self.label.after(10, self.show_frame)
-
-
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     sign_window = SignWindow(root)
-#     root.mainloop()
-
-
-
-
-
-# import tkinter as tk
-# from tkinter import Frame, Tk, Canvas, Button, PhotoImage, Label
-# from PIL import Image, ImageTk
-# import paho.mqtt.client as mqtt
+# import urllib.request
 # import numpy as np
-# import cv2
+# from tkinter import Tk as tk
 # import requests
-
-# class SignWindow:
-
-#     def __init__(self, master):
-#         self.master = master
-#         self.master.title("Sign Recognition")
-#         screen_width = self.master.winfo_screenwidth()
-#         screen_height = self.master.winfo_screenheight()
-
-#         x = (screen_width - 1200) // 2
-#         y = (screen_height - 800) // 2
-
-#         self.master.geometry(f"1200x700+{x}+{y}")
-
-#         self.main_frame = Frame(self.master, width=700, height=480, bg="white")
-#         self.main_frame.place(relx=0.5, rely=0.43, anchor=tk.CENTER)
-#         self.main_frame.pack_propagate(False)  
-
-#         self.label = Label(self.main_frame)
-#         self.label.pack()
-
-#         self.text_label = Label(self.master, text="", font=("Arial", 12))
-#         self.text_label.place(relx=0.5, rely=0.86, anchor=tk.CENTER)
-
-#         self.button = Button(
-#             self.master, 
-#             text="Click", 
-#             bg="#4CAF50",  
-#             fg="white",    
-#             font=("Arial", 12),  
-#             relief="raised",     
-#             borderwidth=2,       
-#             padx=10,             
-#             pady=5                
-#         )
-#         self.button.place(relx=0.5, rely=0.93, anchor=tk.CENTER)
-
-#         self.canvas = Canvas(self.master, width=1200, height=150)
-#         self.canvas.place(x = 0, y = 0)
-        
-#         self.image_image_2 = PhotoImage(file=self.relative_to_assets("image_2.png"))
-
-#         self.canvas.create_image(55.0, 72.0, image=self.image_image_2)
-
-#         self.canvas.create_text(
-#             90.0,
-#             56.0,
-#             anchor="nw",
-#             text="SIGN RECOGNITION",
-#             fill="#000000",
-#             font=("Lato Bold", 27 * -1)
-#         )           
-        
-#         self.show_frame()
-
-#         # MQTT setup
-#         self.mqtt_client = mqtt.Client()
-#         self.mqtt_client.on_connect = self.on_connect
-#         self.mqtt_client.on_message = self.on_message
-#         self.mqtt_client.connect("mqtt.example.com", 1883, 60)
-#         self.mqtt_client.loop_start()
-
-#     def on_connect(self, client, userdata, flags, rc):
-#         print("Connected with result code "+str(rc))
-#         self.mqtt_client.subscribe("cam/image")
-
-#     def on_message(self, client, userdata, msg):
-#         print("Message received!")
-#         img = cv2.imdecode(np.frombuffer(msg.payload, np.uint8), -1)
-#         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#         img = cv2.resize(img, (self.main_frame.winfo_width(), self.main_frame.winfo_height()))
-#         img = Image.fromarray(img)
-#         img = ImageTk.PhotoImage(image=img)
-#         self.label.img = img
-#         self.label.config(image=img)
-
-#         # Gửi ảnh từ MQTT về phía AI
-#         _, img_encoded = cv2.imencode('.jpg', cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR))
-#         response = requests.post("http://<AI_IP_ADDRESS>/api/process_image", data=img_encoded.tostring())
-#         if response.status_code == 200:
-#             print("Image sent successfully!")
-#         else:
-#             print("Failed to send image:", response.status_code)
-
-#     def relative_to_assets(self, path: str) -> str:
-#         return f"assets/frame0/{path}"
-
-#     def show_frame(self):
-#         self.master.after(1000, self.show_frame)
-
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     sign_window = SignWindow(root)
-#     root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import tkinter as tk
-# from tkinter import Label
+# import base64
+# from concurrent.futures import ThreadPoolExecutor
+# import threading
 # from PIL import Image, ImageTk
-# import requests
-# import numpy as np
-# import cv2
 
-# class SignWindow:
-#     def __init__(self, master):
-#         self.master = master
-#         self.master.title("Sign Recognition")
-#         screen_width = self.master.winfo_screenwidth()
-#         screen_height = self.master.winfo_screenheight()
+# subnet = '192.168.1'
+# admin_username = "admin"
+# admin_password = "admin123"
+# def find_esp32_cam():
+#     cam_ip = None
+#     event = threading.Event()
+#     all_threads = []
 
-#         x = (screen_width - 640) // 2
-#         y = (screen_height - 480) // 2
-
-#         self.master.geometry(f"640x480+{x}+{y}")
-
-#         self.label = Label(self.master)
-#         self.label.pack()
-
-#         # HTTP endpoint for video streaming
-#         self.endpoint = "http://192.168.1.17/cam.mjpeg"
-
-#         # Start video streaming
-#         self.show_video()
-
-#     def show_video(self):
-#         # Send HTTP request to ESP32-CAM and get the response
-#         response = requests.get(self.endpoint, stream=True)
-
-#         # Process the response data as video frames
-#         if response.status_code == 200:
-#             # Initialize an empty byte array to store the video frames
-#             img_array = bytearray()
-
-#             # Loop through the response content and append to the byte array
-#             for chunk in response.iter_content(chunk_size=1024):
-#                 img_array.extend(chunk)
-                
-#                 # Search for the end of frame marker
-#                 if b'\xff\xd9' in img_array:
-#                     # Decode the frame
-#                     frame = cv2.imdecode(np.asarray(img_array, dtype=np.uint8), cv2.IMREAD_COLOR)
-                    
-#                     # Resize the frame to fit the display window
-#                     frame = cv2.resize(frame, (640, 480))
-                    
-#                     # Convert the frame from BGR to RGB format
-#                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    
-#                     # Convert the frame to PhotoImage format for display
-#                     img = Image.fromarray(frame)
-#                     img = ImageTk.PhotoImage(image=img)
-                    
-#                     # Update the label with the new frame
-#                     self.label.img = img
-#                     self.label.config(image=img)
-                    
-#                     # Clear the byte array for the next frame
-#                     img_array.clear()
-
-#                     # Break the loop to process the next frame
-#                     break
-                
-#             # Schedule the next frame update after 10 milliseconds
-#             self.master.after(10, self.show_video)
-#         else:
-#             print("Failed to receive video stream")
-
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     sign_window = SignWindow(root)
-#     root.mainloop()
-
-
-
-
-
-
-
-
-
-
-# import tkinter as tk
-# from tkinter import Frame, Button, PhotoImage, Toplevel, Label
-# import cv2
-# import numpy as np
-# from PIL import Image, ImageTk
-# import requests
-# from pathlib import Path
-
-# OUTPUT_PATH = Path(__file__).parent
-# ASSETS_PATH = OUTPUT_PATH / "assets" / "frame0"
-
-# class SignWindow:
-#     @staticmethod
-#     def relative_to_assets(path: str) -> Path:
-#         return ASSETS_PATH / Path(path)
-    
-#     def __init__(self, master):
-#         self.master = master
-#         self.master.title("Sign Recognition")
-#         screen_width = self.master.winfo_screenwidth()
-#         screen_height = self.master.winfo_screenheight()
-
-#         x = (screen_width - 1200) // 2
-#         y = (screen_height - 800) // 2
-
-#         self.master.geometry(f"1200x700+{x}+{y}")
-
-#         self.main_frame = Frame(self.master, width=700, height=480, bg="white")
-#         self.main_frame.place(relx=0.5, rely=0.43, anchor=tk.CENTER)
-#         self.main_frame.pack_propagate(False)  
-
-#         self.label = Label(self.main_frame)
-#         self.label.pack()
-
-#         self.text_label = Label(self.master, text="", font=("Arial", 12))
-#         self.text_label.place(relx=0.5, rely=0.86, anchor=tk.CENTER)
-
-#         self.button = Button(
-#             self.master, 
-#             text="Click", 
-#             bg="#4CAF50",  
-#             fg="white",    
-#             font=("Arial", 12),  
-#             relief="raised",     
-#             borderwidth=2,       
-#             padx=10,             
-#             pady=5,
-#             command=self.detect_sign
-#         )
-#         self.button.place(relx=0.5, rely=0.93, anchor=tk.CENTER)
-
-#         self.canvas = tk.Canvas(self.master, width=1200, height=150)
-#         self.canvas.place(x=0, y=0)
-        
-#         self.image_image_2 = PhotoImage(file=self.relative_to_assets("image_2.png"))
-#         self.canvas.create_image(55.0, 72.0, image=self.image_image_2)
-
-#         self.canvas.create_text(
-#             90.0,
-#             56.0,
-#             anchor="nw",
-#             text="SIGN RECOGNITION",
-#             fill="#000000",
-#             font=("Lato Bold", 27 * -1)
-#         )           
-        
-#         self.show_frame()
-    
-#     def detect_sign(self):
+#     def check_ip(ip):
+#         nonlocal cam_ip
+#         if cam_ip or event.is_set():  
+#             return
 #         try:
-#             ret, frame = self.cap.read()
-#             if ret:
-#                 _, img_encoded = cv2.imencode('.jpg', frame)
-#                 response = requests.post("http://<AI_IP_ADDRESS>/api/process_image", data=img_encoded.tostring())
-#                 if response.status_code == 200:
-#                     print("Image sent successfully!")
-#                 else:
-#                     print("Failed to send image:", response.status_code)
+#             response = requests.get(f'http://{ip}/cam_status', auth=(admin_username, admin_password), timeout=5)
+#             if response.status_code == 200 and response.text.strip() == "ESP32-CAM":
+#                 cam_ip = ip
+#                 print(f"ESP32-CAM found at IP address: {ip}")
+#                 event.set()  
+#         except requests.exceptions.RequestException:
 #             pass
-#         except Exception as e:
-#             print("Error:", e)
-#             self.text_label.config(text="Lỗi 1")
+#     cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
+#     cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  
+#     cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8))  
+#     with ThreadPoolExecutor(max_workers=25) as executor:
+#         for i in range(1, 256):
+#             thread = threading.Thread(target=check_ip, args=(f'{subnet}.{i}',))
+#             all_threads.append(thread)
+#             thread.start()
+#             executor.submit(check_ip, f'{subnet}.{i}')
+#     for thread in all_threads:
+#         thread.join()
+#     return cam_ip
+# def get_stream(cam_ip):
+#     if cam_ip is None:
+#         print("No ESP32-CAM found in the network")
+#         return
+#     url = f'http://{cam_ip}/cam.mjpeg'
+#     auth_header = 'Basic ' + base64.b64encode(f'{admin_username}:{admin_password}'.encode()).decode()
+#     try:
+#         request = urllib.request.Request(url)
+#         request.add_header('Authorization', auth_header)
+#         stream = urllib.request.urlopen(request)
+#         bytes = b''
+#         while True:
+#             bytes += stream.read(1024)
+#             a = bytes.find(b'\xff\xd8')
+#             b = bytes.find(b'\xff\xd9')
+#             if a != -1 and b != -1:
+#                 jpg = bytes[a:b+2]
+#                 bytes = bytes[b+2:]
+#                 frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+#                 yield frame
+#     except Exception as e:
+#         print("Error:", e)
+#         yield None
+# def send_frame_to_ai(frame):
+#     try:
+#         _, img_encoded = cv2.imencode('.jpg', frame)
+#         response = requests.post('http://127.0.0.1:5000/predict', files={'image': img_encoded.tostring()})
+#         if response.status_code == 200:
+#             print(response.content)
+#             print("Frame đã được gửi thành công cho AI!")
+#         else:
+#             print("Lỗi khi gửi frame cho AI:", response.status_code)
+#     except Exception as e:
+#         print("Lỗi khi gửi frame cho AI:", e)
+# def display_stream(cam_ip):
+#     cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
+#     cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  # Thay đổi kích thước cửa sổ hiển thị
+
+#     cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8))  # Hiển thị cửa sổ trước khi kết nối
+#     exit_program = False 
+#     for frame in get_stream(cam_ip):
+#         if frame is not None:
+#             cv2.imshow('ESP32-CAM Stream', frame)
+#             draw_square(frame)
+#             # send_frame_to_ai(frame)
+#         else:
+#             print("Lỗi cam")  # In lỗi ra cửa sổ console
+        
+#         if 0xFF == ord('x'):  
+#             print('hi')
+#             exit_program = True
+#             break
+#     if exit_program:
+#         cv2.destroyAllWindows()
+#         exit(0)
     
-#     def show_frame(self):
-#         try:
-#             url = 'http://192.168.1.17/cam.mjpeg'
-#             imgResp = requests.get(url)
-#             imgNp = np.array(bytearray(imgResp.content), dtype=np.uint8)
-#             img = cv2.imdecode(imgNp, -1)
-#             frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#             frame = cv2.resize(frame, (self.main_frame.winfo_width(), self.main_frame.winfo_height()))
-#             img = Image.fromarray(frame)
-#             img = ImageTk.PhotoImage(image=img)
-#             self.label.img = img
-#             self.label.config(image=img)
-#             self.label.after(10, self.show_frame)
-#         except Exception as e:
-#             print("Error:", e)
-#             self.text_label.config(text="Lỗi 2")
+# def draw_square(frame):
+#     x1, y1, x2, y2 = 100, 100, 300, 300
+#     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-# if __name__ == "__main__":
-#     root = tk.Tk()
-#     sign_window = SignWindow(root)
-#     root.update_idletasks()  
-#     root.deiconify()
-#     root.mainloop()
-
-
-
-
-
-
-
-
-
-
-
-
-# import tkinter as tk
-# from tkinter import Frame, Button, PhotoImage, Toplevel, Label
-# import cv2
-# import numpy as np
-# from PIL import Image, ImageTk
-# import requests
-# from pathlib import Path
-# import sys
-
-# OUTPUT_PATH = Path(__file__).parent
-# ASSETS_PATH = OUTPUT_PATH / "assets" / "frame0"
-
-# class SignWindow:
-#     @staticmethod
-#     def relative_to_assets(path: str) -> Path:
-#         return ASSETS_PATH / Path(path)
-    
+# class CameraApp:
 #     def __init__(self, master):
 #         self.master = master
-#         self.master.title("Sign Recognition")
-#         screen_width = self.master.winfo_screenwidth()
-#         screen_height = self.master.winfo_screenheight()
+#         self.master.title("Camera App")
 
-#         x = (screen_width - 1200) // 2
-#         y = (screen_height - 800) // 2
+#         self.frame = None
+#         self.cap = None
 
-#         self.master.geometry(f"1200x700+{x}+{y}")
+#         self.create_widgets()
 
-#         self.main_frame = Frame(self.master, width=700, height=480, bg="white")
-#         self.main_frame.place(relx=0.5, rely=0.43, anchor=tk.CENTER)
-#         self.main_frame.pack_propagate(False)  
+#     def create_widgets(self):
+#         self.video_panel = tk.Label(self.master)
+#         self.video_panel.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-#         self.label = Label(self.main_frame)
-#         self.label.pack()
+#         self.start_button = tk.Button(self.master, text="Start Camera", command=self.start_camera)
+#         self.start_button.pack(side=tk.LEFT, padx=10, pady=5)
 
-#         self.text_label = Label(self.master, text="", font=("Arial", 12))
-#         self.text_label.place(relx=0.5, rely=0.86, anchor=tk.CENTER)
+#         self.stop_button = tk.Button(self.master, text="Stop Camera", command=self.stop_camera, state=tk.DISABLED)
+#         self.stop_button.pack(side=tk.LEFT, padx=10, pady=5)
 
-#         self.button = Button(
-#             self.master, 
-#             text="Click", 
-#             bg="#4CAF50",  
-#             fg="white",    
-#             font=("Arial", 12),  
-#             relief="raised",     
-#             borderwidth=2,       
-#             padx=10,             
-#             pady=5,
-#             command=self.detect_sign
-#         )
-#         self.button.place(relx=0.5, rely=0.93, anchor=tk.CENTER)
+#         self.find_camera_button = tk.Button(self.master, text="Find Camera", command=self.find_camera)
+#         self.find_camera_button.pack(side=tk.LEFT, padx=10, pady=5)
 
-#         self.close_button = Button(
-#             self.master, 
-#             text="Close", 
-#             bg="#FF6347",  
-#             fg="white",    
-#             font=("Arial", 12),  
-#             relief="raised",     
-#             borderwidth=2,       
-#             padx=10,             
-#             pady=5,
-#             command=self.close_window
-#         )
-#         self.close_button.place(relx=0.9, rely=0.93, anchor=tk.CENTER)
+#         self.status_label = tk.Label(self.master, text="", fg="blue")
+#         self.status_label.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
-#         self.canvas = tk.Canvas(self.master, width=1200, height=150)
-#         self.canvas.place(x=0, y=0)
-        
-#         self.image_image_2 = PhotoImage(file=self.relative_to_assets("image_2.png"))
-#         self.canvas.create_image(55.0, 72.0, image=self.image_image_2)
+#     def start_camera(self):
+#         if self.cap is None:
+#             self.cap = cv2.VideoCapture(0)
 
-#         self.canvas.create_text(
-#             90.0,
-#             56.0,
-#             anchor="nw",
-#             text="SIGN RECOGNITION",
-#             fill="#000000",
-#             font=("Lato Bold", 27 * -1)
-#         )           
-        
-#         self.show_frame()
-    
-#     def detect_sign(self):
-#         try:
-#             ret, frame = self.cap.read()
-#             if ret:
-#                 _, img_encoded = cv2.imencode('.jpg', frame)
-#                 response = requests.post("http://<AI_IP_ADDRESS>/api/process_image", data=img_encoded.tostring())
-#                 if response.status_code == 200:
-#                     print("Image sent successfully!")
-#                 else:
-#                     print("Failed to send image:", response.status_code)
-#             pass
-#         except Exception as e:
-#             print("Error:", e)
-#             self.text_label.config(text="Lỗi 1")
-    
+#         if self.cap.isOpened():
+#             self.start_button.config(state=tk.DISABLED)
+#             self.stop_button.config(state=tk.NORMAL)
+#             self.find_camera_button.config(state=tk.DISABLED)
+
+#             self.status_label.config(text="Camera started")
+
+#             self.show_frame()
+
+#     def stop_camera(self):
+#         if self.cap is not None and self.cap.isOpened():
+#             self.cap.release()
+#             self.cap = None
+
+#             self.start_button.config(state=tk.NORMAL)
+#             self.stop_button.config(state=tk.DISABLED)
+#             self.find_camera_button.config(state=tk.NORMAL)
+
+#             self.status_label.config(text="Camera stopped")
+
+#             if self.frame is not None:
+#                 self.frame = None
+#                 self.video_panel.config(image="")
+
+#     def find_camera(self):
+#         cam_ip = find_esp32_cam()
+#         if cam_ip:
+#             display_stream(cam_ip)
+#         else:
+#             self.status_label.config(text="Camera stopped")
 #     def show_frame(self):
-#         try:
-#             url = 'http://192.168.1.17/cam.mjpeg'
-#             imgResp = requests.get(url, timeout=1)  # Sử dụng timeout để giới hạn thời gian kết nối
-#             imgNp = np.array(bytearray(imgResp.content), dtype=np.uint8)
-#             img = cv2.imdecode(imgNp, -1)
-#             frame = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#             frame = cv2.resize(frame, (self.main_frame.winfo_width(), self.main_frame.winfo_height()))
-#             img = Image.fromarray(frame)
-#             img = ImageTk.PhotoImage(image=img)
-#             self.label.img = img
-#             self.label.config(image=img)
-#             self.label.after(10, self.show_frame)
-#         except Exception as e:
-#             print("Error:", e)
-#             self.text_label.config(text="Lỗi 2")
-    
-#     def close_window(self):
-#         self.master.destroy()
+#         _, frame = self.cap.read()
+#         if frame is not None:
+#             self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#             self.frame = Image.fromarray(self.frame)
+#             self.frame = ImageTk.PhotoImage(self.frame)
+
+#             self.video_panel.config(image=self.frame)
+#             self.video_panel.image = self.frame
+
+#             self.video_panel.after(10, self.show_frame)  # Update frame every 10 milliseconds
+#         else:
+#             self.stop_camera()
+#             self.status_label.config(text="Error: Failed to capture frame")
+
+# def main():
+#     root = tk()
+#     root.geometry("800x600")  
+#     CameraApp(root)
+#     root.mainloop()
 
 # if __name__ == "__main__":
-#     root = tk.Tk()
-#     sign_window = SignWindow(root)
-#     root.update_idletasks()  
-#     root.deiconify()
-#     root.mainloop()
-#     sys.exit()
+#     main()
+
+
+
+
+
+
+
 
 
 
@@ -569,72 +198,261 @@
 
 
 import cv2
-import urllib.request
 import numpy as np
-from tkinter import Toplevel, Label
-from tkinter import Tk
+import base64
+from tkinter import Label, Button, Text
+import tkinter as tk
+from PIL import Image, ImageTk
+import urllib.request
+import threading
 import requests
 
-url = 'http://192.168.1.12/cam.mjpeg'  
-def get_stream():
-    try:
-        stream = urllib.request.urlopen(url)
-        bytes = b''
-        while True:
-            bytes += stream.read(1024)
-            a = bytes.find(b'\xff\xd8')
-            b = bytes.find(b'\xff\xd9')
-            if a != -1 and b != -1:
-                jpg = bytes[a:b+2]
-                bytes = bytes[b+2:]
-                frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-                yield frame
-    except Exception as e:
-        print("Error:", e)
-        yield None
-def process_stream():
-    for frame in get_stream():
+subnet = '192.168.1'  
+username = "admin"
+password = "admin123"
+
+class CameraApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Camera App")
+        self.cap = None
+        self.frame = None
+        self.window_width = 1024
+        self.window_height = 800
+        self.running = False
+        self.video_frame = tk.Frame(self.master, width=self.window_width - 50, height=self.window_height - 200)
+        self.video_frame.pack()
+        self.esp_running = False
+        # Tạo khung chứa các button và label
+        self.control_frame = tk.Frame(self.master)
+        self.control_frame.pack()
+
+        self.text_field_frame = tk.Frame(self.master, width=self.window_width, height=200)
+        self.text_field_frame.pack()
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.video_panel = Label(self.video_frame)
+        self.video_panel.pack(fill=tk.BOTH, expand=True)
+
+        self.start_button = Button(self.control_frame, text="Start Camera",command=self.start_camera)
+        self.start_button.pack(side=tk.LEFT, padx=10, pady=5)
+
+        self.stop_button = Button(self.control_frame, text="Stop Camera", command=self.stop_camera, state=tk.DISABLED)
+        self.stop_button.pack(side=tk.LEFT, padx=10, pady=5)
+
+        self.find_camera_button = Button(self.control_frame, text="Find Camera", command=self.find_camera)
+        self.find_camera_button.pack(side=tk.LEFT, padx=10, pady=5)
+
+        self.status_label = Label(self.control_frame, text="", fg="blue")
+        self.status_label.pack(side=tk.LEFT, padx=10, pady=5)
+
+        self.text_field = Text(self.text_field_frame)
+        self.text_field.pack(fill=tk.BOTH, expand=True)
+
+    def start_camera(self):
+        if self.cap is None:
+            self.cap = cv2.VideoCapture(0)
+        if self.cap.isOpened():
+            self.start_button.config(state=tk.DISABLED)
+            self.stop_button.config(state=tk.NORMAL)
+            self.find_camera_button.config(state=tk.DISABLED)
+            self.status_label.config(text="Camera started")
+            self.show_frame()
+
+    def stop_camera(self):
+        if self.running:
+            self.running = False 
+        if self.cap is not None and self.cap.isOpened():
+            self.cap.release()
+            self.cap = None
+            self.start_button.config(state=tk.NORMAL)
+            self.stop_button.config(state=tk.DISABLED)
+            self.find_camera_button.config(state=tk.NORMAL)
+            self.status_label.config(text="Camera stopped")
+            if self.frame is not None:
+                self.frame = None
+                self.video_panel.config(image="")
+
+    def find_camera(self):
+        self.status_label.config(text="Searching camera...")
+        result_cam_ip = self.find_esp32_cam()
+        if result_cam_ip:
+            print('ESP32-CAM found at IP address:', result_cam_ip)
+            self.status_label.config(text=f"ESP32-CAM found at IP address: {result_cam_ip}")
+            self.get_stream(result_cam_ip)
+        else:
+            print("Timeout occurred while searching for camera")
+            self.status_label.config(text="Timeout occurred while searching for camera")
+            self.find_camera_button.config(state=tk.NORMAL)  
+            self.start_button.config(state=tk.NORMAL) 
+            self.stop_button.config(state=tk.DISABLED)
+    def find_esp32_cam(self):
+        cam_ip = None
+        found_event = threading.Event()
+        semaphore = threading.Semaphore(10)  
+        threads_count = 0
+        def check_ip(ip):
+            nonlocal cam_ip,threads_count
+            # print('ip: ', ip, '\n')
+            try:
+                response = requests.get(f'http://{ip}/cam_status', auth=(username, password), timeout=10)
+                print(f"Response from IP {ip}: {response.status_code} \n")
+                if response.status_code == 200 and response.text.strip() == "ESP32-CAM":
+                    with semaphore:  
+                        cam_ip = ip
+                        found_event.set()  
+            except requests.exceptions.RequestException as e:
+                pass
+            finally:
+                threads_count += 1
+                if threads_count == 255:
+                    found_event.set()
+        
+        threads = []
+        for i in range(1, 256):
+            thread = threading.Thread(target=check_ip, args=(f'{subnet}.{i}',))
+            threads.append(thread)
+            thread.start()
+        
+        found_event.wait(timeout=3)  
+        
+        for thread in threads:
+            thread.join(timeout=0.1)  
+        
+        return cam_ip
+    
+    # def display_stream(self, cam_ip):
+        # self.running = True
+        # self.get_stream(cam_ip)
+        # for frame in self.get_stream(cam_ip):
+        #     cnt = cnt + 1
+        #     if not self.running:  
+        #         break
+        #     if frame is not None:
+        #         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #         frame_pil = Image.fromarray(frame_rgb)
+        #         frame_tk = ImageTk.PhotoImage(frame_pil)
+        #         print('vẽ frame: ', cnt, "\n")
+        #         self.video_panel.config(image=frame_tk)
+        #         self.video_panel.image = frame_tk
+        #         # self.draw_square(frame)
+        #     else:
+        #         self.stop_camera()
+        #         self.status_label.config(text="Error: Failed to view video")
+        #         break
+        #     if cv2.waitKey(1) == ord('x'):
+        #         self.status_label.config(text="Exit Esp32 CAM")
+        #         break
+    
+    def get_stream(self, cam_ip):
+        # self.esp_running = True
+        # print('cam_ip: ', cam_ip)
+        # print('get stream')
+        # if cam_ip is None:
+        #     print("No ESP32-CAM found in the network")
+        #     return
+        # url = f'http://{cam_ip}/cam.mjpeg'
+        # auth_header = 'Basic ' + base64.b64encode(f'{username}:{password}'.encode()).decode()
+        # # try:
+        # request = urllib.request.Request(url)
+        # request.add_header('Authorization', auth_header)
+        # stream = urllib.request.urlopen(request)
+        # bytes = b''
+        # while self.esp_running:
+        #     bytes += stream.read(1024)
+        #     a = bytes.find(b'\xff\xd8')
+        #     b = bytes.find(b'\xff\xd9')
+        #     if a != -1 and b != -1:
+        #         jpg = bytes[a:b + 2]
+        #         bytes = bytes[b + 2:]
+        #         frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+        #         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #         frame_pil = Image.fromarray(frame_rgb)
+        #         frame_tk = ImageTk.PhotoImage(frame_pil)
+        #         self.video_panel.config(image=frame_tk)
+        #         self.video_panel.image = frame_tk
+        #         # cv2.imshow('ESP32-CAM Stream', frame)
+        #     if cv2.waitKey(1) == ord('x'):
+        #         self.esp_running = False
+        #         self.stop_camera()
+        #         self.status_label.config(text="Exit Esp32 CAM")
+        #         break
+        # self.get_frame(stream, bytes)  
+        # except Exception as e:
+        #     print("Error in get_stream:", e)
+        #     yield None
+        self.esp_running = True
+        print('cam_ip: ', cam_ip)
+        print('get stream')
+        if cam_ip is None:
+            print("No ESP32-CAM found in the network")
+            return
+        url = f'http://{cam_ip}/cam.mjpeg'
+        auth = (username, password)
+        try:
+            response = requests.get(url, auth=auth, stream=True)
+            response.raise_for_status()  # Kiểm tra nếu có lỗi trong quá trình nhận dữ liệu
+
+            bytes = b''
+            for chunk in response.iter_content(chunk_size=1024):
+                bytes += chunk
+                a = bytes.find(b'\xff\xd8')
+                b = bytes.find(b'\xff\xd9')
+                if a != -1 and b != -1:
+                    jpg = bytes[a:b + 2]
+                    bytes = bytes[b + 2:]
+                    frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+                    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frame_pil = Image.fromarray(frame_rgb)
+                    frame_tk = ImageTk.PhotoImage(frame_pil)
+                    self.video_panel.config(image=frame_tk)
+                    self.video_panel.image = frame_tk
+                    # cv2.imshow('ESP32-CAM Stream', frame)
+                if cv2.waitKey(1) == ord('x'):
+                    self.esp_running = False
+                    self.stop_camera()
+                    self.status_label.config(text="Exit Esp32 CAM")
+                    break
+        except requests.exceptions.RequestException as e:
+            print("Error in get_stream:", e)
+    def get_frame(self, stream, bytes):
+        bytes += stream.read(1024)
+        a = bytes.find(b'\xff\xd8')
+        b = bytes.find(b'\xff\xd9')
+        if a != -1 and b != -1:
+            jpg = bytes[a:b + 2]
+            bytes = bytes[b + 2:]
+            frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame_pil = Image.fromarray(frame_rgb)
+            frame_tk = ImageTk.PhotoImage(frame_pil)
+            self.video_panel.config(image=frame_tk)
+            self.video_panel.image = frame_tk
+            self.video_panel.after(10, self.get_frame)
+            # cv2.imshow('ESP32-CAM Stream', frame)
+        if cv2.waitKey(1) == ord('x'):
+            self.esp_running = False
+            self.stop_camera()
+            self.status_label.config(text="Exit Esp32 CAM")
+    def show_frame(self):
+        _, frame = self.cap.read()
         if frame is not None:
-            send_frame_to_ai(frame)
+            self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            self.frame = Image.fromarray(self.frame)
+            self.frame = ImageTk.PhotoImage(self.frame)
+            self.video_panel.config(image=self.frame)
+            self.video_panel.image = self.frame
+            self.video_panel.after(10, self.show_frame)  
         else:
-            print("Lỗi khi nhận frame từ camera")
-def send_frame_to_ai(frame):
-    try:
-        _, img_encoded = cv2.imencode('.jpg', frame)
-        response = requests.post('http://127.0.0.1:5000/predict', files={'image': img_encoded.tostring()})
-        if response.status_code == 200:
-            print(response.content)
-            print("Frame đã được gửi thành công cho AI!")
-        else:
-            print("Lỗi khi gửi frame cho AI:", response.status_code)
-    except Exception as e:
-        print("Lỗi khi gửi frame cho AI:", e)
-def display_stream():
-    cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  # Thay đổi kích thước cửa sổ hiển thị
+            self.stop_camera()
+            self.status_label.config(text="Error: Failed to capture frame")
 
-    cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8))  # Hiển thị cửa sổ trước khi kết nối
-
-    for frame in get_stream():
-        if frame is not None:
-            cv2.imshow('ESP32-CAM Stream', frame)
-            send_frame_to_ai(frame)
-        else:
-            print("Lỗi cam")  # In lỗi ra cửa sổ console
-        if cv2.waitKey(1) == 27:  # Nhấn phím Esc để thoát
-            break
-
-    cv2.destroyAllWindows()
-def show_window():
-    window = Tk()
-    window.title("Sign Window")
-    display_stream()
-    cv2.destroyAllWindows()
-    window.mainloop()
+def main():
+    root = tk.Tk()
+    CameraApp(root)
+    root.mainloop()
 if __name__ == "__main__":
-    display_stream()
-    cv2.destroyAllWindows()
-
-
-
+    main()
 
