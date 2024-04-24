@@ -185,12 +185,94 @@
 #     main()
 
 
+# self.get_frame(stream, bytes)  
+        # except Exception as e:
+        #     print("Error in get_stream:", e)
+        #     yield None
+        # self.esp_running = True
+        # print('cam_ip: ', cam_ip)
+        # print('get stream')
+        # if cam_ip is None:
+        #     print("No ESP32-CAM found in the network")
+        #     return
+        # url = f'http://{cam_ip}/cam.mjpeg'
+        # auth = (username, password)
+        # try:
+        #     cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
+        #     cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  # Thay đổi kích thước cửa sổ hiển thị
+
+        #     cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8))  # Hiển thị cửa sổ trước khi kết nối
+        #     response = requests.get(url, auth=auth, stream=True)
+        #     response.raise_for_status()  # Kiểm tra nếu có lỗi trong quá trình nhận dữ liệu
+
+        #     bytes = b''
+        #     for chunk in response.iter_content(chunk_size=1024):
+        #         bytes += chunk
+        #         a = bytes.find(b'\xff\xd8')
+        #         b = bytes.find(b'\xff\xd9')
+        #         if a != -1 and b != -1:
+        #             jpg = bytes[a:b + 2]
+        #             bytes = bytes[b + 2:]
+        #             frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+        #             # frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #             # frame_pil = Image.fromarray(frame_rgb)
+        #             # frame_tk = ImageTk.PhotoImage(frame_pil)
+        #             # self.video_panel.config(image=frame_tk)
+        #             # self.video_panel.image = frame_tk
+        #             cv2.imshow('ESP32-CAM Stream', frame)
+        #         if cv2.waitKey(1) == ord('x'):
+        #             self.esp_running = False
+        #             self.stop_camera()
+        #             self.status_label.config(text="Exit Esp32 CAM")
+        #             break
+        # except requests.exceptions.RequestException as e:
+        #     print("Error in get_stream:", e)
 
 
 
+# def display_stream(self, cam_ip):
+        # self.running = True
+        # self.get_stream(cam_ip)
+        # for frame in self.get_stream(cam_ip):
+        #     cnt = cnt + 1
+        #     if not self.running:  
+        #         break
+        #     if frame is not None:
+        #         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #         frame_pil = Image.fromarray(frame_rgb)
+        #         frame_tk = ImageTk.PhotoImage(frame_pil)
+        #         print('vẽ frame: ', cnt, "\n")
+        #         self.video_panel.config(image=frame_tk)
+        #         self.video_panel.image = frame_tk
+        #         # self.draw_square(frame)
+        #     else:
+        #         self.stop_camera()
+        #         self.status_label.config(text="Error: Failed to view video")
+        #         break
+        #     if cv2.waitKey(1) == ord('x'):
+        #         self.status_label.config(text="Exit Esp32 CAM")
+        #         break
 
 
-
+# def get_frame(self, stream, bytes):
+#         bytes += stream.read(1024)
+#         a = bytes.find(b'\xff\xd8')
+#         b = bytes.find(b'\xff\xd9')
+#         if a != -1 and b != -1:
+#             jpg = bytes[a:b + 2]
+#             bytes = bytes[b + 2:]
+#             frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+#             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#             frame_pil = Image.fromarray(frame_rgb)
+#             frame_tk = ImageTk.PhotoImage(frame_pil)
+#             self.video_panel.config(image=frame_tk)
+#             self.video_panel.image = frame_tk
+#             self.video_panel.after(10, self.get_frame)
+#             # cv2.imshow('ESP32-CAM Stream', frame)
+#         if cv2.waitKey(1) == ord('x'):
+#             self.esp_running = False
+#             self.stop_camera()
+#             self.status_label.config(text="Exit Esp32 CAM")
 
 
 
@@ -281,7 +363,7 @@ class CameraApp:
         if result_cam_ip:
             print('ESP32-CAM found at IP address:', result_cam_ip)
             self.status_label.config(text=f"ESP32-CAM found at IP address: {result_cam_ip}")
-            self.get_stream(result_cam_ip)
+            self.get_stream(result_cam_ip, self.text_field)
         else:
             print("Timeout occurred while searching for camera")
             self.status_label.config(text="Timeout occurred while searching for camera")
@@ -323,30 +405,34 @@ class CameraApp:
         
         return cam_ip
     
-    # def display_stream(self, cam_ip):
-        # self.running = True
-        # self.get_stream(cam_ip)
-        # for frame in self.get_stream(cam_ip):
-        #     cnt = cnt + 1
-        #     if not self.running:  
-        #         break
-        #     if frame is not None:
-        #         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        #         frame_pil = Image.fromarray(frame_rgb)
-        #         frame_tk = ImageTk.PhotoImage(frame_pil)
-        #         print('vẽ frame: ', cnt, "\n")
-        #         self.video_panel.config(image=frame_tk)
-        #         self.video_panel.image = frame_tk
-        #         # self.draw_square(frame)
-        #     else:
-        #         self.stop_camera()
-        #         self.status_label.config(text="Error: Failed to view video")
-        #         break
-        #     if cv2.waitKey(1) == ord('x'):
-        #         self.status_label.config(text="Exit Esp32 CAM")
-        #         break
     
-    def get_stream(self, cam_ip):
+    def send_frame_to_ai(self, frame,text_field):
+        _, img_encoded = cv2.imencode('.jpg', frame)
+        response = requests.post('http://127.0.0.1:5000/predict', files={'image': img_encoded.tostring()})
+        if response.status_code == 200:
+            # print(response.content)
+            prediction = response.json()
+            predicted_char = prediction.get('predicted_char', '')
+            # Xử lý các trường hợp đặc biệt
+            if predicted_char == "nothing":
+                # Không làm gì nếu không có ký tự được nhận diện
+                pass
+            elif predicted_char == "space":
+                # Thêm dấu cách vào text field
+                text_field.insert(tk.END, " ")
+            elif predicted_char == "del":
+                # Xóa 1 ký tự trước đó nếu có
+                current_text = text_field.get("1.0", tk.END)
+                if len(current_text) > 1:
+                    text_field.delete("end-2c")
+            else:
+                # Nếu không có trường hợp đặc biệt, thêm ký tự nhận diện vào text field
+                text_field.insert(tk.END, predicted_char)
+                print("Frame đã được gửi thành công cho AI!: ",predicted_char)
+        else:
+            print("Lỗi khi gửi frame cho AI:", response.status_code)
+        
+    def get_stream(self, cam_ip, text_field):
         self.esp_running = True
         print('cam_ip: ', cam_ip)
         print('get stream')
@@ -376,72 +462,13 @@ class CameraApp:
                 # self.video_panel.config(image=frame_tk)
                 # self.video_panel.image = frame_tk
                 cv2.imshow('ESP32-CAM Stream', frame)
-            if cv2.waitKey(1) == ord('x'):
-                self.esp_running = False
-                self.stop_camera()
-                self.status_label.config(text="Exit Esp32 CAM")
-                break
-        # self.get_frame(stream, bytes)  
-        # except Exception as e:
-        #     print("Error in get_stream:", e)
-        #     yield None
-        # self.esp_running = True
-        # print('cam_ip: ', cam_ip)
-        # print('get stream')
-        # if cam_ip is None:
-        #     print("No ESP32-CAM found in the network")
-        #     return
-        # url = f'http://{cam_ip}/cam.mjpeg'
-        # auth = (username, password)
-        # try:
-        #     cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
-        #     cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  # Thay đổi kích thước cửa sổ hiển thị
+                self.send_frame_to_ai(frame,text_field)
+                if cv2.waitKey(1) == ord('x'):
+                    self.esp_running = False
+                    self.stop_camera()
+                    self.status_label.config(text="Exit Esp32 CAM")
+                    break
 
-        #     cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8))  # Hiển thị cửa sổ trước khi kết nối
-        #     response = requests.get(url, auth=auth, stream=True)
-        #     response.raise_for_status()  # Kiểm tra nếu có lỗi trong quá trình nhận dữ liệu
-
-        #     bytes = b''
-        #     for chunk in response.iter_content(chunk_size=1024):
-        #         bytes += chunk
-        #         a = bytes.find(b'\xff\xd8')
-        #         b = bytes.find(b'\xff\xd9')
-        #         if a != -1 and b != -1:
-        #             jpg = bytes[a:b + 2]
-        #             bytes = bytes[b + 2:]
-        #             frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-        #             # frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        #             # frame_pil = Image.fromarray(frame_rgb)
-        #             # frame_tk = ImageTk.PhotoImage(frame_pil)
-        #             # self.video_panel.config(image=frame_tk)
-        #             # self.video_panel.image = frame_tk
-        #             cv2.imshow('ESP32-CAM Stream', frame)
-        #         if cv2.waitKey(1) == ord('x'):
-        #             self.esp_running = False
-        #             self.stop_camera()
-        #             self.status_label.config(text="Exit Esp32 CAM")
-        #             break
-        # except requests.exceptions.RequestException as e:
-        #     print("Error in get_stream:", e)
-    def get_frame(self, stream, bytes):
-        bytes += stream.read(1024)
-        a = bytes.find(b'\xff\xd8')
-        b = bytes.find(b'\xff\xd9')
-        if a != -1 and b != -1:
-            jpg = bytes[a:b + 2]
-            bytes = bytes[b + 2:]
-            frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_pil = Image.fromarray(frame_rgb)
-            frame_tk = ImageTk.PhotoImage(frame_pil)
-            self.video_panel.config(image=frame_tk)
-            self.video_panel.image = frame_tk
-            self.video_panel.after(10, self.get_frame)
-            # cv2.imshow('ESP32-CAM Stream', frame)
-        if cv2.waitKey(1) == ord('x'):
-            self.esp_running = False
-            self.stop_camera()
-            self.status_label.config(text="Exit Esp32 CAM")
     def show_frame(self):
         _, frame = self.cap.read()
         if frame is not None:
