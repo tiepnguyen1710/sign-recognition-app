@@ -275,6 +275,11 @@
 #             self.status_label.config(text="Exit Esp32 CAM")
 
 
+# frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+# frame_pil = Image.fromarray(frame_rgb)
+# frame_tk = ImageTk.PhotoImage(frame_pil)
+# self.video_panel.config(image=frame_tk)
+# self.video_panel.image = frame_tk
 
 
 
@@ -409,26 +414,22 @@ class CameraApp:
     def send_frame_to_ai(self, frame,text_field):
         _, img_encoded = cv2.imencode('.jpg', frame)
         response = requests.post('http://127.0.0.1:5000/predict', files={'image': img_encoded.tostring()})
-        if response.status_code == 200:
-            # print(response.content)
+        if response.status_code == 200: 
             prediction = response.json()
             predicted_char = prediction.get('predicted_char', '')
-            # Xử lý các trường hợp đặc biệt
-            if predicted_char == "nothing":
-                # Không làm gì nếu không có ký tự được nhận diện
-                pass
-            elif predicted_char == "space":
-                # Thêm dấu cách vào text field
-                text_field.insert(tk.END, " ")
-            elif predicted_char == "del":
-                # Xóa 1 ký tự trước đó nếu có
-                current_text = text_field.get("1.0", tk.END)
-                if len(current_text) > 1:
-                    text_field.delete("end-2c")
-            else:
-                # Nếu không có trường hợp đặc biệt, thêm ký tự nhận diện vào text field
-                text_field.insert(tk.END, predicted_char)
-                print("Frame đã được gửi thành công cho AI!: ",predicted_char)
+            text_field.insert(tk.END, predicted_char)
+            print("Frame đã được gửi thành công cho AI!: ",predicted_char)
+            # if predicted_char == "nothing":
+            #     pass
+            # elif predicted_char == "space":
+            #     text_field.insert(tk.END, " ")
+            # elif predicted_char == "del":
+            #     current_text = text_field.get("1.0", tk.END)
+            #     if len(current_text) > 1:
+            #         text_field.delete("end-2c")
+            # else:
+            #     text_field.insert(tk.END, predicted_char)
+            #     print("Frame đã được gửi thành công cho AI!: ",predicted_char)
         else:
             print("Lỗi khi gửi frame cho AI:", response.status_code)
         
@@ -440,9 +441,6 @@ class CameraApp:
             print("No ESP32-CAM found in the network")
             return
         url = f'http://{cam_ip}/cam.mjpeg'
-        cv2.namedWindow('ESP32-CAM Stream', cv2.WINDOW_NORMAL)
-        cv2.resizeWindow('ESP32-CAM Stream', 640, 480)  # Thay đổi kích thước cửa sổ hiển thị
-        cv2.imshow('ESP32-CAM Stream', np.zeros((480, 640, 3), dtype=np.uint8)) 
         auth_header = 'Basic ' + base64.b64encode(f'{username}:{password}'.encode()).decode()
         request = urllib.request.Request(url)
         request.add_header('Authorization', auth_header)
@@ -456,14 +454,11 @@ class CameraApp:
                 jpg = bytes[a:b + 2]
                 bytes = bytes[b + 2:]
                 frame = cv2.imdecode(np.frombuffer(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-                # frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                # frame_pil = Image.fromarray(frame_rgb)
-                # frame_tk = ImageTk.PhotoImage(frame_pil)
-                # self.video_panel.config(image=frame_tk)
-                # self.video_panel.image = frame_tk
+                x1, y1, x2, y2 = 100, 100, 300, 300
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.imshow('ESP32-CAM Stream', frame)
-                self.send_frame_to_ai(frame,text_field)
-                if cv2.waitKey(1) == ord('x'):
+                # self.send_frame_to_ai(frame,text_field)
+                if cv2.waitKey(1) == 27:
                     self.esp_running = False
                     self.stop_camera()
                     self.status_label.config(text="Exit Esp32 CAM")
@@ -472,11 +467,15 @@ class CameraApp:
     def show_frame(self):
         _, frame = self.cap.read()
         if frame is not None:
+            # Vẽ hình vuông focus
+            x1, y1, x2, y2 = 50, 50, 200, 200
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
             self.frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             self.frame = Image.fromarray(self.frame)
             self.frame = ImageTk.PhotoImage(self.frame)
             self.video_panel.config(image=self.frame)
             self.video_panel.image = self.frame
+            self.send_frame_to_ai(frame,self.text_field)
             self.video_panel.after(10, self.show_frame)  
         else:
             self.stop_camera()
