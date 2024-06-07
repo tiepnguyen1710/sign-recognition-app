@@ -18,8 +18,11 @@ subnet = '192.168.43'
 username = "admin"
 password = "admin123"
 
-OUTPUT_PATH = Path(__file__).parent
-ASSETS_PATH = OUTPUT_PATH / Path(r"E:\Learn DUT\Year 3\PBL5\Interface\sign-recognition-app\assets\frame1")
+# Lấy đường dẫn tới thư mục hiện tại của file này
+ROOT_PATH = Path(__file__).parent
+
+# Tạo đường dẫn đến thư mục assets từ root_path
+ASSETS_PATH = ROOT_PATH / "assets" / "frame1"
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
